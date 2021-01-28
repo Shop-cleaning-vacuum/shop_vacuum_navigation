@@ -9,7 +9,7 @@
 ###  Necessary Imports
 ##################################################
 import rospy
-from std_msgs.msg import String
+from debug.msg import DebugMessage
 
 ##################################################
 ###  Callbacks
@@ -18,7 +18,7 @@ from std_msgs.msg import String
 # This method will be called when there is info on the
 # debug info topic
 def DebugCallback(data):
-    rospy.loginfo(rospy.get_caller_id() + ": " + data.data)
+    rospy.loginfo(rospy.get_caller_id() + ":\n\t Source: " + data.node_name + " Message: " + data.debug_message + "\n")
 
 ##################################################
 ###  Main Method
@@ -31,7 +31,7 @@ def DebugListener():
 
     # Subscribe the Debug Info topic inorder to 
     # recieve debug information from all of the components
-    rospy.Subscriber('DebugInformation', String, DebugCallback)
+    rospy.Subscriber('DebugInformation', DebugMessage, DebugCallback)
 
     # Indefinitely listen to the topic
     rospy.spin()

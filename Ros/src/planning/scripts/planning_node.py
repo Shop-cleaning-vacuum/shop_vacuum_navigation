@@ -9,7 +9,7 @@
 ###  Necessary Imports
 ##################################################
 import rospy
-from std_msgs.msg import String
+from debug.msg import DebugMessage
 
 ##################################################
 ###  Callbacks
@@ -30,18 +30,21 @@ def PlanningInit():
 # topicand send debug info periodically
 def DebugOut():
     # Publish to the topic, "DebugInformation"
-    pub = rospy.Publisher('DebugInformation', String, queue_size=10)
+    pub = rospy.Publisher('DebugInformation', DebugMessage, queue_size=10)
 
     # Use a publish rate of 10hz
     pub_rate = rospy.Rate(10)
 
     # If ROS core is still running -> attempt to send message
     while not rospy.is_shutdown():
-            hello_str = "hello world"
-            pub.publish(hello_str)
+            # Create the debug message
+            msg = DebugMessage()
+            msg.node_name = "Planning"
+            msg.debug_message = "How's it going friend"
+
+            # Publish the debug message then sleep for 10 hz
+            pub.publish(msg)
             pub_rate.sleep()
-
-
 
 if __name__ == '__main__':
     try:

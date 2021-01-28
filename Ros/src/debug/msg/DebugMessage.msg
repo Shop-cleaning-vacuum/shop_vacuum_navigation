@@ -2,4 +2,5 @@
 # to the debug node from the other components
 # in the project
 
-string string
+string node_name
+string debug_message
