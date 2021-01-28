@@ -2,3 +2,4 @@
 # to the debug node from the other components
 # in the project
 
+string string
