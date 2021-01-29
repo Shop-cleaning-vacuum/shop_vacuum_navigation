@@ -9,8 +9,11 @@
 ###  Necessary Imports
 ##################################################
 import rospy
+import std_msgs.msg
 from debug.msg import DebugMessage
 from control.msg import MotorAPI
+from sensor_msgs.msg import PointCloud2
+import sensor_msgs.point_cloud2 as pc2
 
 ##################################################
 ###  Callbacks
@@ -58,6 +61,9 @@ def TestMessages():
     # Publish to the topic, "MotorControl"
     motor_pub = rospy.Publisher('MotorControl', MotorAPI, queue_size=10)
 
+    # Publish to the topic, "CurrentPosition"
+    cur_pos_pub = rospy.Publisher('CurrentPosition', PointCloud2, queue_size=10)
+
     # Use a publish rate of 1 Hz
     pub_rate = rospy.Rate(1)
 
@@ -69,28 +75,44 @@ def TestMessages():
 
         # --- Debug message ---
 
-        # Create the debug message
-        msg = DebugMessage()
-        msg.node_name = "Planning"
-        msg.debug_message = "Hello Friend"
+            # Create the debug message
+            msg = DebugMessage()
+            msg.node_name = "Planning"
+            msg.debug_message = "Hello Friend"
 
-        # Publish the debug message 
-        debug_pub.publish(msg)
-
-        # Sleep for 1 second
-        pub_rate.sleep()
+            # Publish the debug message 
+            debug_pub.publish(msg)
 
         # --- API motor control message ---
 
-        # Create the motor control command call
-        msg = MotorAPI()
-        msg.command = "STOP"
+            # Create the motor control command call
+            msg = MotorAPI()
+            msg.command = "STOP"
 
-        # Publish the message
-        motor_pub.publish(msg)
+            # Publish the message
+            motor_pub.publish(msg)
 
-        # Sleep for 1 second
+            # Sleep for 1 second
+            pub_rate.sleep()
 
+        # --- Point cloud message ---
+
+            # Create the Point cloud object
+            point_cloud = [[1.0, 1.0, 0.0],[1.0, 2.0, 0.0]]
+
+            # Fromat the header
+            header = std_msgs.msg.Header()
+            header.stamp = rospy.Time.now()
+            header.frame_id = 'map'
+
+            # Convert the point clouds to a message
+            point_cloud_msg = pc2.create_cloud_xyz32(header, point_cloud)
+
+            #publish    
+            cur_pos_pub.publish(point_cloud_msg)
+
+            # Sleep for 1 second
+            pub_rate.sleep()
 
 
 if __name__ == '__main__':
