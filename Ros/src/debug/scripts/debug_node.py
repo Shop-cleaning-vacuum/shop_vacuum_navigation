@@ -9,7 +9,7 @@
 ###  Necessary Imports
 ##################################################
 import rospy
-from debug.msg import DebugMessage
+from debug.msg import DebugMessage, JSON
 from sensor_msgs.msg import PointCloud2, LaserScan
 import sensor_msgs.point_cloud2 as pc2
 
@@ -35,6 +35,12 @@ def LidarDataCallback(data):
     print(data.ranges)
     print("\n")
 
+# This method will be called when a JSON message is recieved
+def JSONCallback(data):
+    rospy.loginfo(rospy.get_caller_id() + ":\n\t JSON Data:")
+    print("\t" + data.json_string)
+    print("\n")
+
 
 ##################################################
 ###  Main Method
@@ -56,6 +62,10 @@ def DebugListener():
     # Subscribe to the lidar data topic inorder to 
     # recieve lidar data
     rospy.Subscriber('LidarData', LaserScan, LidarDataCallback)
+
+    # Subscribe to the JSON topic inorder to 
+    # recieve JSON files from other components and users
+    rospy.Subscriber('JSONData', JSON, JSONCallback)
 
     # Indefinitely listen to the topics
     rospy.spin()

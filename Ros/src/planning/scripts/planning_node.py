@@ -10,7 +10,7 @@
 ##################################################
 import rospy
 import std_msgs.msg
-from debug.msg import DebugMessage
+from debug.msg import DebugMessage, JSON
 from control.msg import MotorAPI
 from sensor_msgs.msg import PointCloud2, LaserScan
 import sensor_msgs.point_cloud2 as pc2
@@ -66,6 +66,9 @@ def TestMessages():
 
     # Publish to the topic, "LidarData"
     lidar_pub = rospy.Publisher('LidarData', LaserScan, queue_size=10)
+
+    # Publish to the topic, "JSONData"
+    json_pub = rospy.Publisher('JSONData', JSON, queue_size=10)
 
     # Use a publish rate of 1 Hz
     pub_rate = rospy.Rate(0.5)
@@ -145,6 +148,20 @@ def TestMessages():
 
             # Publish the message
             lidar_pub.publish(lidar_data_msg)
+
+            # Sleep for 1 second
+            pub_rate.sleep()
+
+        # --- JSON message ---
+
+            # Create the JSON message object
+            json_msg = JSON()
+
+            # Populate the message
+            json_msg.json_string = "{ \"Header\":{ \"Lidar_data\": { \"sensor_1\": \"12345\", }, }, },"
+
+            # Publish the message
+            json_pub.publish(json_msg)
 
             # Sleep for 1 second
             pub_rate.sleep()
