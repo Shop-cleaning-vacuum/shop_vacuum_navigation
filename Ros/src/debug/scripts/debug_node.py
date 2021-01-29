@@ -8,9 +8,15 @@
 ##################################################
 ###  Necessary Imports
 ##################################################
+
+# Standard imports
 import rospy
+
+# Imports for custom messages
 from debug.msg import DebugMessage, JSON
-from sensor_msgs.msg import PointCloud2, LaserScan
+
+# Imports for sensor data messages
+from sensor_msgs.msg import PointCloud2, LaserScan, CompressedImage
 import sensor_msgs.point_cloud2 as pc2
 
 ##################################################
@@ -41,6 +47,12 @@ def JSONCallback(data):
     print("\t" + data.json_string)
     print("\n")
 
+# This method will be called when a image is ready representing 
+# the current frame 
+def CurrentFrameCallback(data):
+    rospy.loginfo(rospy.get_caller_id() + ":\n\t Current Frame:")
+    print("\tRAW_DATA: can't print\n")
+
 
 ##################################################
 ###  Main Method
@@ -66,6 +78,10 @@ def DebugListener():
     # Subscribe to the JSON topic inorder to 
     # recieve JSON files from other components and users
     rospy.Subscriber('JSONData', JSON, JSONCallback)
+
+    # Subscribe to the current frame topic to 
+    # recieve the current frame from the camaera
+    rospy.Subscriber('CurrentFrame', CompressedImage, CurrentFrameCallback)
 
     # Indefinitely listen to the topics
     rospy.spin()

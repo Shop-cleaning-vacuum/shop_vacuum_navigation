@@ -8,11 +8,17 @@
 ##################################################
 ###  Necessary Imports
 ##################################################
+
+# Standard imports
 import rospy
 import std_msgs.msg
+
+# Imports for custom messages
 from debug.msg import DebugMessage, JSON
 from control.msg import MotorAPI
-from sensor_msgs.msg import PointCloud2, LaserScan
+
+# Imports for sensor data messages
+from sensor_msgs.msg import PointCloud2, LaserScan, CompressedImage
 import sensor_msgs.point_cloud2 as pc2
 
 ##################################################
@@ -69,6 +75,9 @@ def TestMessages():
 
     # Publish to the topic, "JSONData"
     json_pub = rospy.Publisher('JSONData', JSON, queue_size=10)
+
+    # Publish to the topic, "CurrentFrame"
+    cur_frame_pub = rospy.Publisher('CurrentFrame', CompressedImage, queue_size=10)
 
     # Use a publish rate of 1 Hz
     pub_rate = rospy.Rate(0.5)
@@ -166,6 +175,23 @@ def TestMessages():
             # Sleep for 1 second
             pub_rate.sleep()
 
+        # --- Image messages ---
+
+            # Create the compressed image object
+            image_msg = CompressedImage()
+
+            # Store the image
+            image_msg.data = [1, 1, 0,1, 2, 0]
+            #image_msg.data = image_2msg("/home/patrick/Downloads/env_pic.jpeg")
+
+            # Congigure the message as a jpeg   
+            image_msg.format = "jpeg"
+
+            # Publish the message
+            cur_frame_pub.publish(image_msg)
+
+            # Sleep for 1 second
+            pub_rate.sleep()
 
 if __name__ == '__main__':
     try:
