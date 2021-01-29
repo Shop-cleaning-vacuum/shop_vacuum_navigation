@@ -12,7 +12,7 @@ import rospy
 import std_msgs.msg
 from debug.msg import DebugMessage
 from control.msg import MotorAPI
-from sensor_msgs.msg import PointCloud2
+from sensor_msgs.msg import PointCloud2, LaserScan
 import sensor_msgs.point_cloud2 as pc2
 
 ##################################################
@@ -64,8 +64,11 @@ def TestMessages():
     # Publish to the topic, "CurrentPosition"
     cur_pos_pub = rospy.Publisher('CurrentPosition', PointCloud2, queue_size=10)
 
+    # Publish to the topic, "LidarData"
+    lidar_pub = rospy.Publisher('LidarData', LaserScan, queue_size=10)
+
     # Use a publish rate of 1 Hz
-    pub_rate = rospy.Rate(1)
+    pub_rate = rospy.Rate(0.5)
 
 
     # 2. ---------- Send a message to all of the topics ----------
@@ -100,7 +103,7 @@ def TestMessages():
             # Create the Point cloud object
             point_cloud = [[1.0, 1.0, 0.0],[1.0, 2.0, 0.0]]
 
-            # Fromat the header
+            # Format the header
             header = std_msgs.msg.Header()
             header.stamp = rospy.Time.now()
             header.frame_id = 'map'
@@ -108,8 +111,40 @@ def TestMessages():
             # Convert the point clouds to a message
             point_cloud_msg = pc2.create_cloud_xyz32(header, point_cloud)
 
-            #publish    
+            # Publish the message
             cur_pos_pub.publish(point_cloud_msg)
+
+            # Sleep for 1 second
+            pub_rate.sleep()
+
+        # --- Point cloud message ---
+
+            # Create the lidar data message object
+            lidar_data_msg = LaserScan()
+
+            # Format the header
+            lidar_data_msg.header.stamp = rospy.Time.now()
+            lidar_data_msg.header.frame_id = 'laser_frame'
+
+            # Populate the message (fake data)
+            num_readings = 10
+            laser_frequency = 40
+
+            lidar_data_msg.angle_min = -1.57
+            lidar_data_msg.angle_max = 1.57
+            lidar_data_msg.angle_increment = 3.14 / num_readings
+            lidar_data_msg.time_increment = (1.0 / laser_frequency) / (num_readings)
+            lidar_data_msg.range_min = 0.0
+            lidar_data_msg.range_max = 100.0
+            lidar_data_msg.ranges = []
+            lidar_data_msg.intensities = []
+
+            for i in range(0, num_readings):
+                lidar_data_msg.ranges.append(1)  
+                lidar_data_msg.intensities.append(1)  
+
+            # Publish the message
+            lidar_pub.publish(lidar_data_msg)
 
             # Sleep for 1 second
             pub_rate.sleep()

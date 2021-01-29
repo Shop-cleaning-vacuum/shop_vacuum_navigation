@@ -10,7 +10,7 @@
 ##################################################
 import rospy
 from debug.msg import DebugMessage
-from sensor_msgs.msg import PointCloud2
+from sensor_msgs.msg import PointCloud2, LaserScan
 import sensor_msgs.point_cloud2 as pc2
 
 ##################################################
@@ -29,6 +29,13 @@ def CurrentLocationCallback(data):
         print ("\tx : %f  y: %f  z: %f" %(p[0],p[1],p[2]))
     print("\n")
 
+# This method will be called when a lidar sensor sends us data
+def LidarDataCallback(data):
+    rospy.loginfo(rospy.get_caller_id() + ":\n\t Lidar Data:")
+    print(data.ranges)
+    print("\n")
+
+
 ##################################################
 ###  Main Method
 ##################################################
@@ -46,7 +53,11 @@ def DebugListener():
     # recieve point cloud information on the current location
     rospy.Subscriber('CurrentPosition', PointCloud2, CurrentLocationCallback)
 
-    # Indefinitely listen to the topic
+    # Subscribe to the lidar data topic inorder to 
+    # recieve lidar data
+    rospy.Subscriber('LidarData', LaserScan, LidarDataCallback)
+
+    # Indefinitely listen to the topics
     rospy.spin()
 
 if __name__ == '__main__':
