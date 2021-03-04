@@ -1,0 +1,7 @@
+<launch>
+  <node name="embedded_listener_node" pkg="communications" type="embedded_listener_node.py" output="screen" >
+  </node>
+
+  <node name="embedded_talker_node" pkg="communications" type="embedded_talker_node.py" output="screen">
+  </node>
+</launch>
