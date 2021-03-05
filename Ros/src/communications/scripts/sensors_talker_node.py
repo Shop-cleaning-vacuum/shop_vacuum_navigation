@@ -36,7 +36,7 @@ SEND_IR_DATA_CMD       = b"RI" + MSG_DELIMITER
 SEND_DISTANCE_DATA_CMD = b"RD" + MSG_DELIMITER
 
 # Configure the UART serial communication
-ser = serial.Serial('/dev/ttyACM2', 9600, timeout=1)
+ser = serial.Serial('/dev/ttyACM4', 9600, timeout=1)
 
 # Flush the communication line
 ser.flush()
