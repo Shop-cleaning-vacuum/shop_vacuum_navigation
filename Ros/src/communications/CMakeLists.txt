@@ -160,6 +160,8 @@ include_directories(
 catkin_install_python(PROGRAMS
   scripts/sensors_listener_node.py
   scripts/sensors_talker_node.py
+  scripts/motors_listener_node.py
+  scripts/motors_talker_node.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
