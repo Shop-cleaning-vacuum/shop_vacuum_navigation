@@ -31,11 +31,15 @@ import time
 # Global constants for the interface protocol between
 # the lower-level microcontroller
 MSG_DELIMITER   = b'$'
-STOP_CMD        = b"S" + MSG_DELIMITER
-FWD_CMD         = b"F" + MSG_DELIMITER
+READ_TABLE_CMD  = b"R" + MSG_DELIMITER
+WRITE_TABLE_CMD = b"W" + MSG_DELIMITER
+SPEED_STOPPED   = 0
+SPEED_SLOW      = 1
+SPEED_MEDIUM    = 5
+SPEED_FULL      = 10
 
 # Globally configure the UART serial communication
-ser = serial.Serial('/dev/ttyACM0', 9600, timeout=1)
+ser = serial.Serial('/dev/ttyACM1', 9600, timeout=1)
 
 # Flush the communication line
 ser.flush()
@@ -46,14 +50,25 @@ ser.flush()
 
 # This method will be called when there is info on the communcations topic
 def CommunicationsCallback(data):
-    # If the command is for the motor control micro controller
-    # then write the assoicated command to the serial port
-    if data.command == "STOP":
-        print("enter")
-        ser.write(STOP_CMD)
+    # Send the given command to the microcontroller
+    if data.command == "read:motors":
+        ser.write(READ_TABLE_CMD)
     
-    elif data.command == "FWD":
-        ser.write(FWD_CMD)
+    elif data.command == "forward":
+        UpdateTable(SPEED_MEDIUM.to_bytes(1, 'big'), SPEED_MEDIUM.to_bytes(1, 'big')) 
+
+    elif data.command == "stop":
+        UpdateTable(SPEED_STOPPED.to_bytes(1, 'big'), SPEED_STOPPED.to_bytes(1, 'big'))
+        
+    elif data.command == "rotate:90":
+        # turn on the left motor
+        UpdateTable(SPEED_MEDIUM.to_bytes(1, 'big'), SPEED_STOPPED.to_bytes(1, 'big')) 
+
+        # wait a predefined amout of time
+        time.sleep(1)
+
+        # stop the robot once it has rotated
+        UpdateTable(SPEED_STOPPED.to_bytes(1, 'big'), SPEED_STOPPED.to_bytes(1, 'big'))
 
 ##################################################
 ###  Methods
@@ -70,6 +85,13 @@ def Main():
 
     # Indefinitely listen to the topics
     rospy.spin()
+
+
+# Method to update the motor control table
+def UpdateTable(param1, param2):
+    ser.write(WRITE_TABLE_CMD)
+    ser.write(param1)
+    ser.write(param2)
 
 if __name__ == '__main__':
     Main()
