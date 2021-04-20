@@ -1,0 +1,7 @@
+<launch>
+  <node name="motors_listener_node" pkg="communications" type="motors_listener_node.py" output="screen" >
+  </node>
+
+  <node name="motors_talker_node" pkg="communications" type="motors_talker_node.py" output="screen">
+  </node>
+</launch>

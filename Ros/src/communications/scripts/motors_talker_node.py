@@ -35,7 +35,7 @@ STOP_CMD        = b"S" + MSG_DELIMITER
 FWD_CMD         = b"F" + MSG_DELIMITER
 
 # Globally configure the UART serial communication
-ser = serial.Serial('/dev/ttyACM3', 9600, timeout=1)
+ser = serial.Serial('/dev/ttyACM0', 9600, timeout=1)
 
 # Flush the communication line
 ser.flush()
@@ -49,6 +49,7 @@ def CommunicationsCallback(data):
     # If the command is for the motor control micro controller
     # then write the assoicated command to the serial port
     if data.command == "STOP":
+        print("enter")
         ser.write(STOP_CMD)
     
     elif data.command == "FWD":
@@ -65,7 +66,7 @@ def Main():
 
     # Subscribe to the communications topic inorder to 
     # recieve communication API commands from all of the components
-    rospy.Subscriber('CommuncationsAPI', CommsAPI, CommunicationsCallback)
+    rospy.Subscriber('CommunicationsAPI', CommsAPI, CommunicationsCallback)
 
     # Indefinitely listen to the topics
     rospy.spin()

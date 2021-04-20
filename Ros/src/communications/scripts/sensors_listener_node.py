@@ -17,6 +17,7 @@ import std_msgs.msg
 
 # Imports for sensor data messages
 from sensor_msgs.msg import PointCloud2, LaserScan
+from communications.msg import SensorData
 
 # Serial communication imports
 import serial
@@ -30,12 +31,18 @@ import time
 # the lower-level microcontroller responsible
 # for collecting sensor data
 MSG_DELIMITER     = '$'
-BRUSH_DATA_ID     = "B"
-IR_DATA_ID        = "I"
-DISTANCE_DATA_ID  = "D"
+TABLE_START       = "S"
+TABLE_END         = "E"
+NUM_BUMP_SENSORS            = 3
+NUM_IR_SENSORS              = 5
+NUM_DISTANCE_SENSORS        = 4
+NUM_BRUSH_CURRENT_SENSORS   = 3
+NUM_BRUSH_TEMP_SENSORS      = 3
+NUM_BRUSH_POSITION_SENSORS  = 3
+
 
 # Globally configure the UART serial communication
-ser = serial.Serial('/dev/ttyACM4', 9600, timeout=1)
+ser = serial.Serial('/dev/ttyACM2', 9600, timeout=1)
 
 # Flush the communication line
 ser.flush()
@@ -48,78 +55,74 @@ ser.flush()
 ###  Methods
 ##################################################
 
-# Main method for this node
+#  --------------------------------------
+#  ----  Main method for this node   ----
 def Main():
     # Initialize the node with name "sensors_listener_node"
     rospy.init_node('sensors_listener_node', anonymous=True)
 
-    # Publish to the topic, "IRData"
-    ir_pub = rospy.Publisher('IRData', LaserScan, queue_size=10)
+    # Create sensor topics to publish too
+    bump_pub        = rospy.Publisher('BumpSensorData', SensorData, queue_size=10)
+    ir_pub          = rospy.Publisher('IRSensorData', SensorData, queue_size=10)
+    distance_pub    = rospy.Publisher('DistanceSensorData', SensorData, queue_size=10)
+    brush_c_pub     = rospy.Publisher('BrushCurrentData', SensorData, queue_size=10)
+    brush_t_pub     = rospy.Publisher('BrushTempData', SensorData, queue_size=10)
+    brush_p_pub     = rospy.Publisher('BrushPositionSensorData', SensorData, queue_size=10)
 
     # Indefinitely listen to the serial port
     while True:
         # Read in the current response 
         line = ser.readline().decode('utf-8').rstrip()
+        
+        # If we recieve the 'start_table' character, then start
+        # reading the table from the microcontroller
+        if line == TABLE_START:
+            ReadTable(bump_pub, ir_pub, distance_pub, brush_c_pub, brush_t_pub,brush_p_pub)
 
-        # If it is valid data then publish it to ROS
-        if line == IR_DATA_ID:
-            ir_pub.publish(ReadIR())
 
-        elif line == BRUSH_DATA_ID:
-            ReadBrush()
 
-        elif line == DISTANCE_DATA_ID:
-            ReadDistance()
+#  -----------------------------------------------
+#  --- Method to read the table of sensor data ---
+#  ---   from the low-level microcontroller    ---
+def ReadTable(bump_pub, ir_pub, distance_pub, brush_c_pub, brush_t_pub,brush_p_pub):
+    # Read all the sensor data
+    bump_sensor_message             = ReadSensorData(NUM_BUMP_SENSORS)
+    ir_sensor_message               = ReadSensorData(NUM_IR_SENSORS)
+    distance_sensor_message         = ReadSensorData(NUM_DISTANCE_SENSORS)
+    brush_current_sensor_message    = ReadSensorData(NUM_BRUSH_CURRENT_SENSORS)
+    brush_temp_sensor_message       = ReadSensorData(NUM_BRUSH_TEMP_SENSORS)
+    brush_position_sensor_message   = ReadSensorData(NUM_BRUSH_POSITION_SENSORS)
 
-# Method to read IR sensor data from the serial port
-def ReadIR():
-    # Create the laser data message object
-    laser_scan_msg = LaserScan()
+    # Publish all the sensor data
+    bump_pub.publish(bump_sensor_message)
+    ir_pub.publish(ir_sensor_message)
+    distance_pub.publish(distance_sensor_message)
+    brush_c_pub.publish(brush_current_sensor_message)
+    brush_t_pub.publish(brush_temp_sensor_message)
+    brush_p_pub.publish(brush_position_sensor_message)
+        
 
-    # Format the header
-    laser_scan_msg.header.stamp = rospy.Time.now()
-    laser_scan_msg.header.frame_id = 'laser_frame'
+#  --------------------------------------
+#  ----     Read in sensor data      ----
+def ReadSensorData(num_sensors):
+    # Read in each byte from the serial line
+    container = []
+    for x in range(num_sensors):
+        container.append(ReadByte())
 
-    # Read in the first byte from the port and 
-    # create an array to hold the data
-    data = []
-    line = ser.readline().decode('utf-8').rstrip()
-    data.append(line)
+    # create and populate the sensor data message
+    sensor_message             = SensorData()
+    sensor_message.num_sensors = num_sensors 
+    sensor_message.sensors     = container
 
-    # Read data until you reach the MSG_DELIMITER 
-    while line != MSG_DELIMITER:
-        # read in the current byte and append it to the array
-        line = ser.readline().decode('utf-8').rstrip()
-        data.append(line)
+    # return the built up message
+    return sensor_message
 
-    # Convert the data to the laser_scan_msg
-    laser_scan_msg.angle_min = float(data[0])
-    laser_scan_msg.angle_max = float(data[1])
-    laser_scan_msg.range_min = float(data[2])
-    laser_scan_msg.range_max = float(data[3])
 
-    # Return the built up laser scan message
-    return laser_scan_msg
-    
-
-# Method to read brush sensor data from the serial port
-def ReadBrush():
-    # Read data until you reach the MSG_DELIMITER
-    line = ser.readline().decode('utf-8').rstrip()
-
-    while line != MSG_DELIMITER:
-        print(line)
-        line = ser.readline().decode('utf-8').rstrip()
-
-# Method to read distance sensor data from the serial port
-def ReadDistance():
-    # Read data until you reach the MSG_DELIMITER
-    line = ser.readline().decode('utf-8').rstrip()
-
-    while line != MSG_DELIMITER:
-        print(line)
-        line = ser.readline().decode('utf-8').rstrip()
-    
+#  --------------------------------------
+#  ---   Read line from serial line   ---
+def ReadByte():
+    return int(ser.readline().decode('utf-8').rstrip())
     
 if __name__ == '__main__':
     Main()
