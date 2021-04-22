@@ -17,6 +17,11 @@ import time
 # Imports for custom messages
 from debug.msg import DebugMessage, JSON
 from control.msg import MotorAPI, HazardBool
+<<<<<<< Updated upstream
+=======
+from communications.msg import CommsAPI
+     
+>>>>>>> Stashed changes
 
 # Imports for sensor data messages
 from sensor_msgs.msg import PointCloud2, LaserScan, CompressedImage
