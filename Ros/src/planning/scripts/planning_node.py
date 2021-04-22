@@ -17,11 +17,15 @@ import time
 # Imports for custom messages
 from debug.msg import DebugMessage, JSON
 from control.msg import MotorAPI, HazardBool
+<<<<<<< HEAD
 <<<<<<< Updated upstream
 =======
 from communications.msg import CommsAPI
      
 >>>>>>> Stashed changes
+=======
+from communications.msg import CommsAPI
+>>>>>>> main
 
 # Imports for sensor data messages
 from sensor_msgs.msg import PointCloud2, LaserScan, CompressedImage
@@ -32,7 +36,11 @@ import sensor_msgs.point_cloud2 as pc2
 
 current_location = (0,0,0)
 isHazard = False
+<<<<<<< HEAD
 TESTING_FAKE_OUTPUTS = True
+=======
+TESTING_FAKE_OUTPUTS = False
+>>>>>>> main
 ##################################################
 ###  Callbacks
 ##################################################
@@ -53,6 +61,7 @@ def HazardBoolCallback(data):
     if data.detectsHazard == "True":
         if(isHazard == False):
              # Create the motor control command call
+<<<<<<< HEAD
             msg = MotorAPI()
             msg.command = "STOP"
 
@@ -71,6 +80,26 @@ def HazardBoolCallback(data):
 
             # Publish the message
             motor_pub.publish(msg)
+=======
+            msg = CommsAPI()
+            msg.command == "stop"
+
+            # Publish the message
+            motor_pub.publish(msg)
+            rospy.loginfo_throttle(1,rospy.get_caller_id() + ":\n\t Currently avoiding Hazard")
+        
+        
+        WasDetected = "True"
+        isHazard = True
+    else:
+        if(isHazard == True):
+            # Create the motor control command call
+            msg = CommsAPI()
+            msg.command = "stop"
+
+            # Publish the message
+            motor_pub.publish(msg)
+>>>>>>> main
         isHazard = False
         WasDetected = "False"
     
@@ -87,6 +116,7 @@ def PlanningInit():
     
     
     # Test all of the ROS message types
+<<<<<<< HEAD
     if(TESTING_FAKE_OUTPUTS):
         debug_pub,motor_pub,cur_pos_pub,lidar_pub,json_pub,cur_frame_pub,pub_rate,hazard_pub = TestMessagesInit()
      
@@ -94,6 +124,15 @@ def PlanningInit():
 
     # PlanningInitialization()
 
+=======
+    if(True):
+        debug_pub,motor_pub,cur_pos_pub,lidar_pub,json_pub,cur_frame_pub,pub_rate,hazard_pub = TestMessagesInit()
+     
+    # Create a fake planning function for testing of the hazard avoidance that overrides planning
+
+    # PlanningInitialization()
+
+>>>>>>> main
     #Hazard avoidance subscribers are called here
     HazardAvoidanceInitilization()
 
@@ -105,8 +144,13 @@ def HazardAvoidance():
     #Hazard function here
 
     # Create the motor control command call
+<<<<<<< HEAD
     msg = MotorAPI()
     msg.command = "TURN_RIGHT"
+=======
+    msg = CommsAPI()
+    msg.command = "rotate:90"
+>>>>>>> main
 
     # Publish the message
     motor_pub.publish(msg)
@@ -126,8 +170,13 @@ def Planning(debug_pub,motor_pub,cur_pos_pub,lidar_pub,json_pub,cur_frame_pub,pu
             
 
             # Create the motor control command call
+<<<<<<< HEAD
             msg = MotorAPI()
             msg.command = "FORWARD"
+=======
+            msg = CommsAPI()
+            msg.command = "forwared"
+>>>>>>> main
 
             # Publish the message
             motor_pub.publish(msg)
@@ -168,7 +217,11 @@ def Planning(debug_pub,motor_pub,cur_pos_pub,lidar_pub,json_pub,cur_frame_pub,pu
 
 
 def HazardAvoidanceInitilization():
+<<<<<<< HEAD
     # rospy.Subscriber('CurrentPosition', PointCloud2, HazardCurrentLocationCallback)
+=======
+    rospy.Subscriber('CurrentPosition', PointCloud2, HazardCurrentLocationCallback)
+>>>>>>> main
     rospy.Subscriber('HazardBool', HazardBool, HazardBoolCallback)
 
 # Method to publish to the debug information 
@@ -186,9 +239,15 @@ def DebugOut(message):
 
             # Publish the debug message 
             pub.publish(msg)
+<<<<<<< HEAD
 
 def TestMessages(debug_pub,motor_pub,cur_pos_pub,lidar_pub,json_pub,cur_frame_pub,pub_rate,hazard_pub):
 
+=======
+
+def TestMessages(debug_pub,motor_pub,cur_pos_pub,lidar_pub,json_pub,cur_frame_pub,pub_rate,hazard_pub):
+
+>>>>>>> main
     # --- Debug message ---
 
             # Create the debug message
@@ -304,7 +363,12 @@ def TestMessagesInit():
     debug_pub = rospy.Publisher('DebugInformation', DebugMessage, queue_size=10)
 
     # Publish to the topic, "MotorControl"
+<<<<<<< HEAD
     motor_pub = rospy.Publisher('MotorControl', MotorAPI, queue_size=10)
+=======
+    # motor_pub = rospy.Publisher('MotorControl', MotorAPI, )
+    motor_pub = rospy.Publisher('CommunicationsAPI', CommsAPI,queue_size=10)
+>>>>>>> main
 
     # Publish to the topic, "CurrentPosition"
     cur_pos_pub = rospy.Publisher('CurrentPosition', PointCloud2, queue_size=10)
@@ -438,6 +502,8 @@ def TestMessagesInit():
 
 if __name__ == '__main__':
     try:
+        print("startubg planning ")
         PlanningInit()
+        print("initialized ")
     except rospy.ROSInterruptException:
         pass

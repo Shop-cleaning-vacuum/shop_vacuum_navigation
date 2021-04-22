@@ -1,0 +1,7 @@
+<launch>
+  <node name="sensors_listener_node" pkg="communications" type="sensors_listener_node.py" output="screen" >
+  </node>
+
+  <node name="sensors_talker_node" pkg="communications" type="sensors_talker_node.py" output="screen">
+  </node>
+</launch>
