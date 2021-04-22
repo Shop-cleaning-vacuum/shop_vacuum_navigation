@@ -12,6 +12,8 @@
 ##################################################
 
 # Standard imports
+import signal
+import sys
 import rospy
 import std_msgs.msg
 
@@ -42,7 +44,7 @@ NUM_BRUSH_POSITION_SENSORS  = 3
 
 
 # Globally configure the UART serial communication
-ser = serial.Serial('/dev/ttyACM2', 9600, timeout=1)
+ser = serial.Serial('/dev/ttyACM0', 9600, timeout=1)
 
 # Flush the communication line
 ser.flush()
@@ -51,6 +53,11 @@ ser.flush()
 ###  Callbacks
 ##################################################
 
+#  --------------------------------------
+#  ----   Method to handle sigints   ----
+def signal_handler(sig, frame):
+    sys.exit(0)
+
 ##################################################
 ###  Methods
 ##################################################
@@ -58,6 +65,9 @@ ser.flush()
 #  --------------------------------------
 #  ----  Main method for this node   ----
 def Main():
+    # Register sigint callback
+    signal.signal(signal.SIGINT, signal_handler)
+
     # Initialize the node with name "sensors_listener_node"
     rospy.init_node('sensors_listener_node', anonymous=True)
 
