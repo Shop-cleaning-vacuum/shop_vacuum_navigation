@@ -17,7 +17,7 @@ import std_msgs.msg
 
 # Imports for sensor data messages
 from sensor_msgs.msg import PointCloud2, LaserScan
-from communications.msg import SensorData
+from communications.msg import SensorData, HazardBool
 
 # Serial communication imports
 import serial
@@ -68,6 +68,7 @@ def Main():
     brush_c_pub     = rospy.Publisher('BrushCurrentData', SensorData, queue_size=10)
     brush_t_pub     = rospy.Publisher('BrushTempData', SensorData, queue_size=10)
     brush_p_pub     = rospy.Publisher('BrushPositionSensorData', SensorData, queue_size=10)
+    hazard_pub      = rospy.Publisher('HazardBool', HazardBool, queue_size=10)
 
     # Indefinitely listen to the serial port
     while True:
@@ -77,14 +78,14 @@ def Main():
         # If we recieve the 'start_table' character, then start
         # reading the table from the microcontroller
         if line == TABLE_START:
-            ReadTable(bump_pub, ir_pub, distance_pub, brush_c_pub, brush_t_pub,brush_p_pub)
+            ReadTable(bump_pub, ir_pub, distance_pub, brush_c_pub, brush_t_pub,brush_p_pub,hazard_pub)
 
 
 
 #  -----------------------------------------------
 #  --- Method to read the table of sensor data ---
 #  ---   from the low-level microcontroller    ---
-def ReadTable(bump_pub, ir_pub, distance_pub, brush_c_pub, brush_t_pub,brush_p_pub):
+def ReadTable(bump_pub, ir_pub, distance_pub, brush_c_pub, brush_t_pub,brush_p_pub,hazard_pub):
     # Read all the sensor data
     bump_sensor_message             = ReadSensorData(NUM_BUMP_SENSORS)
     ir_sensor_message               = ReadSensorData(NUM_IR_SENSORS)
@@ -100,6 +101,18 @@ def ReadTable(bump_pub, ir_pub, distance_pub, brush_c_pub, brush_t_pub,brush_p_p
     brush_c_pub.publish(brush_current_sensor_message)
     brush_t_pub.publish(brush_temp_sensor_message)
     brush_p_pub.publish(brush_position_sensor_message)
+
+    # Publish current HazardBool based on sensor data
+    msg = HazardBool()
+    msg.detectsHazard = "False"
+    for bump_sensor in bump_sensor_message.sensors:
+        if bump_sensor:
+            msg.detectsHazard = "True"
+    if brush_temp_sensor_message[0] == 100:
+        msg.detectsHazard = "True"
+    hazard_pub.publish(msg)
+
+
         
 
 #  --------------------------------------
@@ -108,7 +121,7 @@ def ReadSensorData(num_sensors):
     # Read in each byte from the serial line
     container = []
     for x in range(num_sensors):
-        container.append(ReadByte())
+        container.append(ReI adByte())
 
     # create and populate the sensor data message
     sensor_message             = SensorData()
