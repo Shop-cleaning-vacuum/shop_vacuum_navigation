@@ -11,6 +11,9 @@ ROS=../Ros/
 # ----------- Main Method -------------
 # -------------------------------------
 
+# remove the old sensor output
+rm -f sensor_output.txt
+
 # change to the ROS directory
 cd $ROS
 
