@@ -4,15 +4,15 @@
 # ------------- Globals ---------------
 # -------------------------------------
 
-TEST_FILE=../testing/sensor_output.txt
+TEST_FILE=../testing/ouput/sensor_output.txt
 ROS=../Ros/
 
 # -------------------------------------
 # ----------- Main Method -------------
 # -------------------------------------
 
-# remove the old sensor output
-rm -f sensor_output.txt
+# remove the old test file
+rm -f $TEST_FILE
 
 # change to the ROS directory
 cd $ROS
@@ -23,7 +23,7 @@ source devel/setup.bash
 # start the ros nodes
 roslaunch communications sensors.launch &
 
-# wait 5 seconds for ROS to start up
+# wait 10 seconds for ROS to start up
 sleep 10s
 
 # print the recieved sensor data to a test file
@@ -34,8 +34,8 @@ rostopic echo /BrushCurrentData >> $TEST_FILE &
 rostopic echo /BrushTempData >> $TEST_FILE &
 rostopic echo /BrushPositionSensorData >> $TEST_FILE &
 
-# wait 5 seconds for previous task to finish
-sleep 5s
+# wait 1 seconds for previous task to finish
+sleep 1
 
 # tell the system to read the sensor data
 rostopic pub /CommunicationsAPI communications/CommsAPI "{command: 'read:sensors', param0: 0, param1: 0, param2: 0, param3: 0, param4: 0}"
