@@ -3,6 +3,9 @@
 
 # ------------------ Message Fields ------------------
 
+# name of the type of sensors
+string sensor_name
+
 # number of sensors in this message
 int8 num_sensors
 

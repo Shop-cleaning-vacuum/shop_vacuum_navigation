@@ -12,6 +12,8 @@
 ##################################################
 
 # Standard imports
+import signal
+import sys
 import rospy
 from  std_msgs.msg import Int8
 
@@ -30,7 +32,7 @@ TABLE_START       = "S"
 TABLE_END         = "E"
 
 # Globally configure the UART serial communication
-ser = serial.Serial('/dev/ttyACM1', 9600, timeout=1)
+ser = serial.Serial('/dev/ttyACM0', 9600, timeout=1)
 
 # Flush the communication line
 ser.flush()
@@ -38,6 +40,11 @@ ser.flush()
 ##################################################
 ###  Callbacks
 ##################################################
+
+#  --------------------------------------
+#  ----   Method to handle sigints   ----
+def signal_handler(sig, frame):
+    sys.exit(0)
 
 ##################################################
 ###  Methods
@@ -47,6 +54,9 @@ ser.flush()
 #  --- Method to read the table of motor data ---
 #  ---   from the low-level microcontroller    ---
 def Main():
+    # Register sigint callback
+    signal.signal(signal.SIGINT, signal_handler)
+
     # Initialize the node with name "motors_listener_node"
     rospy.init_node('motors_listener_node', anonymous=True)
 

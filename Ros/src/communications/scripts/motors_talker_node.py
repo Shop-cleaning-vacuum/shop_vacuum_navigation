@@ -39,7 +39,7 @@ SPEED_MEDIUM    = 5
 SPEED_FULL      = 10
 
 # Globally configure the UART serial communication
-ser = serial.Serial('/dev/ttyACM1', 9600, timeout=1)
+ser = serial.Serial('/dev/ttyACM0', 9600, timeout=1)
 
 # Flush the communication line
 ser.flush()

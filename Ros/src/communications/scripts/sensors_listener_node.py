@@ -12,6 +12,8 @@
 ##################################################
 
 # Standard imports
+import signal
+import sys
 import rospy
 import std_msgs.msg
 
@@ -42,7 +44,7 @@ NUM_BRUSH_POSITION_SENSORS  = 3
 
 
 # Globally configure the UART serial communication
-ser = serial.Serial('/dev/ttyACM2', 9600, timeout=1)
+ser = serial.Serial('/dev/ttyACM0', 9600, timeout=1)
 
 # Flush the communication line
 ser.flush()
@@ -51,6 +53,11 @@ ser.flush()
 ###  Callbacks
 ##################################################
 
+#  --------------------------------------
+#  ----   Method to handle sigints   ----
+def signal_handler(sig, frame):
+    sys.exit(0)
+
 ##################################################
 ###  Methods
 ##################################################
@@ -58,6 +65,9 @@ ser.flush()
 #  --------------------------------------
 #  ----  Main method for this node   ----
 def Main():
+    # Register sigint callback
+    signal.signal(signal.SIGINT, signal_handler)
+
     # Initialize the node with name "sensors_listener_node"
     rospy.init_node('sensors_listener_node', anonymous=True)
 
@@ -86,12 +96,12 @@ def Main():
 #  ---   from the low-level microcontroller    ---
 def ReadTable(bump_pub, ir_pub, distance_pub, brush_c_pub, brush_t_pub,brush_p_pub):
     # Read all the sensor data
-    bump_sensor_message             = ReadSensorData(NUM_BUMP_SENSORS)
-    ir_sensor_message               = ReadSensorData(NUM_IR_SENSORS)
-    distance_sensor_message         = ReadSensorData(NUM_DISTANCE_SENSORS)
-    brush_current_sensor_message    = ReadSensorData(NUM_BRUSH_CURRENT_SENSORS)
-    brush_temp_sensor_message       = ReadSensorData(NUM_BRUSH_TEMP_SENSORS)
-    brush_position_sensor_message   = ReadSensorData(NUM_BRUSH_POSITION_SENSORS)
+    bump_sensor_message             = ReadSensorData("BUMP_SENSORS", NUM_BUMP_SENSORS)
+    ir_sensor_message               = ReadSensorData("IR_SENSORS", NUM_IR_SENSORS)
+    distance_sensor_message         = ReadSensorData("DISTANCE_SENSORS", NUM_DISTANCE_SENSORS)
+    brush_current_sensor_message    = ReadSensorData("BRUSH_CURRENT_SENSORS", NUM_BRUSH_CURRENT_SENSORS)
+    brush_temp_sensor_message       = ReadSensorData("BRUSH_TEMP_SENSORS", NUM_BRUSH_TEMP_SENSORS)
+    brush_position_sensor_message   = ReadSensorData("BRUSH_POSITION_SENSORS", NUM_BRUSH_POSITION_SENSORS)
 
     # Publish all the sensor data
     bump_pub.publish(bump_sensor_message)
@@ -104,7 +114,7 @@ def ReadTable(bump_pub, ir_pub, distance_pub, brush_c_pub, brush_t_pub,brush_p_p
 
 #  --------------------------------------
 #  ----     Read in sensor data      ----
-def ReadSensorData(num_sensors):
+def ReadSensorData(sensor_name, num_sensors):
     # Read in each byte from the serial line
     container = []
     for x in range(num_sensors):
@@ -112,6 +122,7 @@ def ReadSensorData(num_sensors):
 
     # create and populate the sensor data message
     sensor_message             = SensorData()
+    sensor_message.sensor_name = sensor_name
     sensor_message.num_sensors = num_sensors 
     sensor_message.sensors     = container
 

@@ -35,7 +35,7 @@ READ_TABLE_CMD  = b"R" + MSG_DELIMITER
 WRITE_TABLE_CMD = b"W" + MSG_DELIMITER
 
 # Configure the UART serial communication
-ser = serial.Serial('/dev/ttyACM2', 9600, timeout=1)
+ser = serial.Serial('/dev/ttyACM0', 9600, timeout=1)
 
 # Flush the communication line
 ser.flush()
