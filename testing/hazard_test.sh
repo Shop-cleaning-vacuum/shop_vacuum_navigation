@@ -37,6 +37,7 @@ sleep 1s
 # tell the system to read the motor data
 printf "Left & Right Motor Status:\n" >> $TEST_FILE
 rostopic pub /CommunicationsAPI communications/CommsAPI "{command: 'read:motors'}" 
+printf "System reads motor status...\n" >> $TEST_FILE
 
 # wait 1 second for previous task to finish
 sleep 1s
