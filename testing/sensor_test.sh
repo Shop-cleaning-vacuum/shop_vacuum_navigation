@@ -4,7 +4,7 @@
 # ------------- Globals ---------------
 # -------------------------------------
 
-TEST_FILE=../testing/ouput/sensor_output.txt
+TEST_FILE=../testing/output/sensor_output.txt
 ROS=../Ros/
 
 # -------------------------------------
@@ -38,5 +38,5 @@ rostopic echo /BrushPositionSensorData >> $TEST_FILE &
 sleep 1
 
 # tell the system to read the sensor data
-rostopic pub /CommunicationsAPI communications/CommsAPI "{command: 'read:sensors', param0: 0, param1: 0, param2: 0, param3: 0, param4: 0}"
+rostopic pub /CommunicationsAPI communications/CommsAPI "{command: 'read:sensors'}"
 

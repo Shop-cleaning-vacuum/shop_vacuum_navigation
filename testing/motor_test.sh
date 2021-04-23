@@ -34,24 +34,24 @@ rostopic echo /RightMotor >> $TEST_FILE &
 sleep 1s
 
 # tell the system to send navigation data to the motor control board
-rostopic pub /CommunicationsAPI communications/CommsAPI "{command: 'stop', param0: 0, param1: 0, param2: 0, param3: 0, param4: 0}" &
+rostopic pub /CommunicationsAPI communications/CommsAPI "{command: 'stop'}" &
 
 # wait 3 seconds for previous task to finish
 sleep 3s
 
 # tell the system to read the motor data
 printf "Left & Right Motor Status:\n" >> $TEST_FILE
-rostopic pub /CommunicationsAPI communications/CommsAPI "{command: 'read:motors', param0: 0, param1: 0, param2: 0, param3: 0, param4: 0}" &
+rostopic pub /CommunicationsAPI communications/CommsAPI "{command: 'read:motors'}" &
 
 # wait 3 seconds for previous task to finish
 sleep 3s
 
 # tell the system to send navigation data to the motor control board
-rostopic pub /CommunicationsAPI communications/CommsAPI "{command: 'forward', param0: 0, param1: 0, param2: 0, param3: 0, param4: 0}" &
+rostopic pub /CommunicationsAPI communications/CommsAPI "{command: 'forward'}" &
 
 # wait 3 seconds for previous task to finish
 sleep 3s
 
 # tell the system to send navigation data to the motor control board
 printf "\nLeft & Right Motor Status:\n" >> $TEST_FILE
-rostopic pub /CommunicationsAPI communications/CommsAPI "{command: 'read:motors', param0: 0, param1: 0, param2: 0, param3: 0, param4: 0}" 
+rostopic pub /CommunicationsAPI communications/CommsAPI "{command: 'read:motors'}" 
