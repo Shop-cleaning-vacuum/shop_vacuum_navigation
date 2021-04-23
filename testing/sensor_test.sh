@@ -31,6 +31,9 @@ rostopic echo /BrushCurrentData >> $TEST_FILE &
 rostopic echo /BrushTempData >> $TEST_FILE &
 rostopic echo /BrushPositionSensorData >> $TEST_FILE &
 
+# wait 5 seconds for previous task to finish
+sleep 5s
 
-# # tell the system to read the sensor data
-# rostopic pub /CommunicationsAPI communications/CommsAPI "{command: 'read:sensors', param0: 0, param1: 0, param2: 0, param3: 0, param4: 0}"
+# tell the system to read the sensor data
+rostopic pub /CommunicationsAPI communications/CommsAPI "{command: 'read:sensors', param0: 0, param1: 0, param2: 0, param3: 0, param4: 0}"
+
