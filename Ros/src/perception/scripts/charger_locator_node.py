@@ -2,12 +2,9 @@
 
 ##################################################
 ###  -- Node Description 
-# This node will be responsible for listening to 
-# the visp_auto_tracker node which is looking
-# for qr codes in its environment. If it finds 
-# a qr code representing a prohibited area it
-# will send evasive pathing to the communications 
-# topic
+# This node will be responsible for locating
+# the charging station and navigating back to 
+# the charging base
 
 ##################################################
 ###  Imports
@@ -28,6 +25,13 @@ import time
 # create node as a publisher to the comms api
 comms_pub = rospy.Publisher('CommunicationsAPI', CommsAPI, queue_size=10)
 
+
+##################################################
+###  DEFINES and globals
+##################################################
+
+TOL = 0.5
+
 ##################################################
 ###  Callbacks
 ##################################################
@@ -37,33 +41,33 @@ def QrCodeCallback(message):
     # retrieve the location of the QR code
     location = rospy.wait_for_message('/visp_auto_tracker/object_position', PoseStamped)
 
-    # if we have a vaild qr code THEN process the label
-    if(message.data != ''):
+    # if we have a vaild ir base qr code THEN process the label
+    if(message.data == "IR_BASE"):
         # stop the robot
         msg = CommsAPI()
         msg.command = "stop"
         comms_pub.publish(msg)
 
-        # IF the qr code is to our left THEN turn right
-        if(location.pose.position.x < 0):   
+        # IF the qr code is to our left THEN turn left
+        if(location.pose.position.x < TOL):   
             msg = CommsAPI()
-            msg.command = "rotate:90"
+            msg.command = "rotate:-5"
             comms_pub.publish(msg)
 
             msg.command = "forward"
             comms_pub.publish(msg)
 
-        # ELSE the qr code is to our right THEN turn left    
-        else:
+        # ELSE the qr code is to our right THEN turn right    
+        elif(location.pose.position.x < -TOL):
             msg = CommsAPI()
-            msg.command = "rotate:-90"
+            msg.command = "rotate:5"
             comms_pub.publish(msg)
 
             msg.command = "forward"
             comms_pub.publish(msg)
 
         # wait a for the actions to take place
-        time.sleep(5)
+        time.sleep(3)
 
     
     
@@ -75,8 +79,8 @@ def QrCodeCallback(message):
 # main method
 def Main():
 
-    # Initialize the node with name "prohibited_areas_node"
-    rospy.init_node('prohibited_areas_node', anonymous=True)
+    # Initialize the node with name "charger_locator_node"
+    rospy.init_node('charger_locator_node', anonymous=True)
 
     # listen to the visp_auto_tracker code message for
     # qr codes that are localized in the environment

@@ -1,0 +1,5 @@
+<launch>
+  <include file="$(find visp_auto_tracker)/launch/tutorial.launch" />
+  <node name="charger_locator_node" pkg="perception" type="charger_locator_node.py" output="screen" >
+  </node>
+</launch>
