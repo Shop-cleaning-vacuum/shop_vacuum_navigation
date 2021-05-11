@@ -70,6 +70,18 @@ def CommunicationsCallback(data):
         # stop the robot once it has rotated
         UpdateTable(SPEED_STOPPED.to_bytes(1, 'big'), SPEED_STOPPED.to_bytes(1, 'big'))
 
+    elif data.command == "rotate:270":
+        # turn on the left motor
+        UpdateTable(SPEED_STOPPED.to_bytes(1, 'big'), SPEED_MEDIUM.to_bytes(1, 'big')) 
+
+        # wait a predefined amout of time
+        time.sleep(1)
+
+        # stop the robot once it has rotated
+        UpdateTable(SPEED_STOPPED.to_bytes(1, 'big'), SPEED_STOPPED.to_bytes(1, 'big'))
+
+
+
 ##################################################
 ###  Methods
 ##################################################

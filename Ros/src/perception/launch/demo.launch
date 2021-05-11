@@ -1,0 +1,4 @@
+<launch>
+  <node name="prohibited_areas_node" pkg="perception" type="prohibited_areas_handler.py" output="screen" >
+  </node>
+</launch>
