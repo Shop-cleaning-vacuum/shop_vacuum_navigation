@@ -45,7 +45,7 @@ def QrCodeCallback(message):
         comms_pub.publish(msg)
 
         # IF the qr code is to our left THEN turn right
-        if(location.pose.position.y < 0):   
+        if(location.pose.position.x < 0):   
             msg = CommsAPI()
             msg.command = "rotate:90"
             comms_pub.publish(msg)
@@ -62,8 +62,8 @@ def QrCodeCallback(message):
             msg.command = "forward"
             comms_pub.publish(msg)
 
-
-        print(message.data, location.pose.position)
+        # wait a for the actions to take place
+        time.sleep(5)
 
     
     
@@ -78,11 +78,9 @@ def Main():
     # Initialize the node with name "prohibited_areas_node"
     rospy.init_node('prohibited_areas_node', anonymous=True)
 
-
-
     # listen to the visp_auto_tracker code message for
     # qr codes that are localized in the environment
-    rospy.Subscriber('/visp_auto_tracker/code_message', String, QrCodeCallback)
+    rospy.Subscriber('/visp_auto_tracker/code_message', String, QrCodeCallback,  queue_size=1)
 
     # Indefinitely listen to the topics
     rospy.spin()
